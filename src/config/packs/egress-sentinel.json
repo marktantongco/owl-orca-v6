@@ -1,0 +1,30 @@
+{
+  "name": "egress-sentinel",
+  "version": "1.0.0",
+  "description": "Authored pack — PCI/proxy-stack synergy profile. Security & compliance prompts (PCI, PII, tokenization, vault, DLP, GDPR, exfiltration) anchor to owl (premium deep-analysis); proxy/HA/egress infra prompts (HAProxy, Squid, Keepalived, VRRP, ICAP, failover, round-robin, egress) anchor to beaver (medium practical-build). Breaker delta: copilot-free carries the highest P3 routing weight (1.5), so it earns a wider failure budget than its cheap-tier siblings (4/50/2 vs 3/45/2) without reaching medium's 5/60/1 — the strongest free upstream stays race-eligible longer.",
+  "rules_delta": {
+    "animals": {
+      "owl": {"keywords_add": [
+        "pci", "compliance", "tokenization", "detokenize",
+        "redact", "pii", "vault", "exfiltration", "audit",
+        "dlp", "gdpr"
+      ]},
+      "beaver": {"keywords_add": [
+        "haproxy", "squid", "keepalived", "vrrp", "icap",
+        "egress", "failover", "roundrobin", "loadbalance",
+        "healthcheck", "proxy"
+      ]}
+    }
+  },
+  "breaker_delta": {
+    "copilot-free": {"threshold": 4, "cooldown": 50, "decay": 2}
+  },
+  "probe_battery": [
+    ["audit the tokenization vault for PII exfiltration risk", "owl"],
+    ["configure haproxy failover with keepalived and squid egress proxy", "beaver"],
+    ["quick prototype ship now", "rabbit"],
+    ["strategy vision roadmap", "eagle"],
+    ["deep analysis root cause failure", "owl"],
+    ["step by step checklist", "ant"]
+  ]
+}

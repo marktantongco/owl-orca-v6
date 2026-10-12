@@ -1,0 +1,24 @@
+# runtime state — never commit
+.secrets/
+*.key
+*.enc
+.env
+.env.*
+quota-state.json
+config/backups/
+logs/
+*.log
+
+# python
+__pycache__/
+*.pyc
+.venv/
+venv/
+node_modules/
+
+# os / editor
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/

@@ -1,0 +1,302 @@
+{
+  "_comment": "OWL-ORCA v6 UNIFIED \u2014 v4.5 providers merged with v5 lineage; NIM reallocated :60004->:60008 (F9); breaker policy carries H4 decay; v6.2 playbook integration: response cache + guardrails + plans + weighted routing + daily quotas (all SIGHUP hot-applied)",
+  "version": "6.2.0-unified",
+  "cache": {
+    "enabled": true,
+    "mode": "simple",
+    "max_age": 3600,
+    "max_entries": 256,
+    "note": "v6.2 P1 (playbook config #5 Portkey): identical prompt (sha256 of model+messages) replays the stored completion; non-streaming only; X-Owl-Orca-Cache hit/miss/bypass; hot-apply via /admin/cache or SIGHUP"
+  },
+  "guardrails": [
+    {
+      "id": "prompt-injection",
+      "action": "block",
+      "note": "v6.2 P2 (Portkey pattern): pre-flight regex battery on the routing prompt; OpenAI-shaped 400 guardrail_violation"
+    },
+    {
+      "id": "self-harm-input",
+      "action": "block"
+    }
+  ],
+  "plans": {
+    "free": {
+      "prefix": "oc-free-",
+      "terminal": "virtu-echo",
+      "rpm": 30,
+      "note": "v6.2 P8 (monetization #3): keys carrying the prefix get labeled virtu-echo completions \u2014 the freemium funnel"
+    },
+    "paid": {
+      "ladder": true,
+      "note": "real animal ladder + fallback tiers + real upstreams"
+    }
+  },
+  "request_settings": {
+    "num_retries": 2,
+    "timeout": 20,
+    "note": "v6.2 P4 (playbook config #2 LiteLLM): ladder walk retried pre-first-byte; race deadline seconds \u2014 both SIGHUP hot-applied"
+  },
+  "providers": {
+    "owl-forward-billing": {
+      "display_name": "OWL Forward Proxy Billing Sidecar",
+      "source_repo": "https://github.com/marktantongco/owl-forward-proxy",
+      "base_url": "http://127.0.0.1:60000",
+      "port": 60000,
+      "type": "billing_monetization",
+      "format": "forward_proxy",
+      "features": [
+        "auth",
+        "per-tier-rate-limits",
+        "usage-metering"
+      ],
+      "memory_max": "128M"
+    },
+    "owl-defense-v6": {
+      "display_name": "OWL Defense Stack v6 (in-process)",
+      "source_repo": "https://github.com/marktantongco/owl-agent-stack",
+      "base_url": "http://127.0.0.1:60001",
+      "type": "memory_optimized",
+      "features": [
+        "get_stats",
+        "TokenBucket_race_fix",
+        "full_http_proxy"
+      ],
+      "supersedes": "owl-defense-v45"
+    },
+    "freebuff-deepseek": {
+      "display_name": "Freebuff DeepSeek via Go JA3",
+      "source_repo": "https://github.com/marktantongco/freebuff-proxy",
+      "base_url": "http://127.0.0.1:1455/v1",
+      "format": "openai_and_anthropic",
+      "memory_max": "256M",
+      "models": [
+        "deepseek/deepseek-v4-pro",
+        "deepseek/deepseek-v4-flash",
+        "deepseek-v3"
+      ],
+      "cost_tier": "cheap",
+      "stealth": {
+        "enabled": true,
+        "ja3": true,
+        "profile": "chrome120",
+        "socks5_pool": true,
+        "multi_token": true,
+        "proxy_refresh_mins": 30
+      },
+      "weight": 1.0,
+      "daily_quota": 20000,
+      "circuit_breaker": {
+        "threshold": 3,
+        "cooldown": 45,
+        "decay": 2
+      }
+    },
+    "antigravity-free": {
+      "display_name": "Antigravity Free (Google)",
+      "source_repo": "https://github.com/marktantongco/antigravity-proxy-gateway",
+      "base_url": "http://127.0.0.1:60003/v1",
+      "format": "anthropic",
+      "runtime": "bun",
+      "models": [
+        "gemini-2.0-flash",
+        "gemini-2.0-pro",
+        "claude-3.5-sonnet-antigravity"
+      ],
+      "cost_tier": "cheap",
+      "requires_translation": "anthropic_to_openai",
+      "extended_thinking": true,
+      "thinking_delta_field": "thinking",
+      "weight": 1.2,
+      "daily_quota": 4000,
+      "circuit_breaker": {
+        "threshold": 3,
+        "cooldown": 45,
+        "decay": 2
+      }
+    },
+    "copilot-free": {
+      "display_name": "GitHub Copilot Free",
+      "source_repo": "https://github.com/marktantongco/owl-orca-v4",
+      "base_url": "https://api.githubcopilot.com",
+      "format": "openai",
+      "models": [
+        "gpt-4o-mini",
+        "gpt-4o",
+        "o1-mini",
+        "claude-3.5-sonnet"
+      ],
+      "cost_tier": "cheap",
+      "canary_weight": 90,
+      "auth_method": "device_flow",
+      "token_encryption": "fernet",
+      "egress": "freebuff-proxy:1455",
+      "weight": 1.5,
+      "daily_quota": 5000,
+      "circuit_breaker": {
+        "threshold": 4,
+        "cooldown": 50,
+        "decay": 2
+      }
+    },
+    "kiro-free": {
+      "display_name": "Kiro Gateway AWS Builder ID",
+      "source_repo": "https://github.com/marktantongco/kiro-gateway",
+      "base_url": "http://127.0.0.1:8333/v1",
+      "format": "openai",
+      "memory_max": "256M",
+      "models": [
+        "claude-3.5-sonnet-kiro",
+        "claude-3-haiku-kiro"
+      ],
+      "cost_tier": "medium",
+      "fallback": true,
+      "auth_method": "aws_builder_oidc",
+      "weight": 1.3,
+      "daily_quota": 3000,
+      "circuit_breaker": {
+        "threshold": 6,
+        "cooldown": 75,
+        "decay": 1
+      }
+    },
+    "nvidia-nim": {
+      "display_name": "NVIDIA NIM (F9: reallocated to :60008)",
+      "source_repo": "https://github.com/marktantongco/nim-to-openai-proxy",
+      "base_url": "http://127.0.0.1:60008/v1",
+      "format": "openai",
+      "models": [
+        "meta/llama-3.1-70b",
+        "meta/llama-3.1-405b",
+        "nvidia/nemotron"
+      ],
+      "cost_tier": "medium",
+      "translate_from": "nvidia_nim",
+      "weight": 0.8,
+      "circuit_breaker": {
+        "threshold": 5,
+        "cooldown": 60,
+        "decay": 1
+      }
+    },
+    "novada-residential": {
+      "display_name": "Novada Residential MCP (403-only last resort)",
+      "source_repo": "https://github.com/marktantongco/Novada-proxy",
+      "base_url": "http://127.0.0.1:60000",
+      "type": "residential_proxy_mcp",
+      "format": "mcp",
+      "models": [
+        "novada-residential"
+      ],
+      "cost_tier": "expensive",
+      "complexity": "blocked_only",
+      "bypass": [
+        "cloudflare",
+        "akamai",
+        "datadome"
+      ],
+      "note": "Use only when 403 cloudflare blocked",
+      "circuit_breaker": {
+        "threshold": 3,
+        "cooldown": 300,
+        "decay": 1
+      }
+    },
+    "omniproxy-smart": {
+      "display_name": "OmniProxy Smart Router (NadirClaw 40-70%)",
+      "source_repo": "https://github.com/marktantongco/omniproxy-ai-smart-router",
+      "base_url": "http://127.0.0.1:60001/v1",
+      "type": "smart_router",
+      "format": "openai",
+      "models": [
+        "smart-router"
+      ],
+      "cost_aware": true,
+      "nadirclaw_routing": true,
+      "savings": "40-70%"
+    },
+    "rtk-token-saver": {
+      "display_name": "RTK Token Saver 60-90%",
+      "source_repo": "https://github.com/marktantongco/rtk",
+      "type": "cli_proxy_token_reduction",
+      "reduction": "60-90%",
+      "enabled": false,
+      "flag": "--with-rtk",
+      "preserve": [
+        "tool_use",
+        "thinking_delta",
+        "input_json_delta"
+      ]
+    },
+    "memory-hub": {
+      "display_name": "Memory Hub (in-process v6, 128M unit eliminated)",
+      "source_repo": "https://github.com/marktantongco/TencentDB-Agent-Memory",
+      "secondary": "https://github.com/marktantongco/mempalace",
+      "type": "team_memory",
+      "backend": "tencentdb_with_sqlite_fallback",
+      "features": [
+        "store_race_winner",
+        "latency_tracking",
+        "failure_decay"
+      ]
+    },
+    "owl-orca-virtual": {
+      "display_name": "OWL-ORCA v6 Virtual Provider (OpenCode entry)",
+      "base_url": "http://127.0.0.1:60001/v1",
+      "models": [
+        "copilot-free",
+        "antigravity-free",
+        "kiro-free",
+        "nim-free",
+        "freebuff-deepseek"
+      ],
+      "routing": {
+        "strategy": "cost-tier + first-byte-wins race (H3+H7)",
+        "cost_aware": true,
+        "fallback": "kiro"
+      }
+    },
+    "virtu-echo": {
+      "display_name": "OWL-ORCA Virtu Echo (virtual completion backend)",
+      "base_url": "http://127.0.0.1:60009/v1",
+      "format": "openai",
+      "memory_max": "64M",
+      "models": [
+        "virtu-echo",
+        "virtu-echo-cheap",
+        "virtu-echo-premium"
+      ],
+      "cost_tier": "virtual",
+      "note": "v6.1 terminal fallback: raced ONLY after the rules fallback_tier ladder is exhausted; never enters normal races",
+      "circuit_breaker": {
+        "threshold": 5,
+        "cooldown": 60,
+        "decay": 1
+      }
+    }
+  },
+  "breaker_policy": {
+    "per_cost_tier": {
+      "cheap": {
+        "threshold": 3,
+        "cooldown": 45,
+        "decay": 2
+      },
+      "medium": {
+        "threshold": 5,
+        "cooldown": 60,
+        "decay": 1
+      },
+      "premium": {
+        "threshold": 7,
+        "cooldown": 90,
+        "decay": 1
+      },
+      "expensive": {
+        "threshold": 3,
+        "cooldown": 300,
+        "decay": 1
+      }
+    },
+    "note": "cheap: trip fast(3)/recover fast(45s, decay 2) - alternatives abound; medium: proven 5/60s; premium: patient(7) - lockout hurts, 90s; expensive: trip fast(3), stay out 300s - quota protection, anti-ban. v6.1: breaker STATE survives and POLICY hot-applies via SIGHUP reload or POST /admin/breakers - no restart, no TCP drop. v6.2: weights order candidates (OpenRouter provider-order), daily_quota trips BEFORE the ceiling (GooseRelay discipline)."
+  }
+}

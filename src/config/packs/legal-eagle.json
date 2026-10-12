@@ -1,0 +1,24 @@
+{
+  "name": "legal-eagle",
+  "version": "1.0.0",
+  "description": "v6.2 P7 (playbook monetization #2): owl keywords for contract review / legal analysis; premium tier anchor",
+  "rules_delta": {
+    "animals": {
+      "owl": {"keywords_add": ["contract", "clause", "liability", "indemnity",
+                               "warranty", "breach", "tort", "jurisdiction",
+                               "governing", "arbitration", "infringement",
+                               "confidentiality", "termination", "majeure"]}
+    }
+  },
+  "breaker_delta": {
+    "kiro-free": {"threshold": 6, "cooldown": 75, "decay": 1}
+  },
+  "probe_battery": [
+    ["review this contract clause for liability", "owl"],
+    ["quick prototype ship now", "rabbit"],
+    ["creative novel remix workaround", "dolphin"],
+    ["strategy vision roadmap", "eagle"],
+    ["build system architecture", "beaver"],
+    ["deep analysis root cause failure", "owl"]
+  ]
+}

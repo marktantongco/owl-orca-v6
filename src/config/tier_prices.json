@@ -1,0 +1,13 @@
+{
+  "version": "6.2.0",
+  "currency": "USD",
+  "per_key": {
+    "free":      {"per_1k_requests": 0.0, "metered": true},
+    "cheap":     {"per_1k_requests": 0.10, "metered": true},
+    "medium":    {"per_1k_requests": 0.40, "metered": true},
+    "premium":   {"per_1k_requests": 1.20, "metered": true},
+    "anonymous": {"per_1k_requests": 0.0, "metered": false}
+  },
+  "overage": {"policy": "charge", "note": "per-key rate limits enforced at :60000"},
+  "note": "v6.2 P6 (playbook monetization #1): usage-metered animal-ladder API. Tier-aware pricing is the thing the animal ladder was tuned to enable — pay rabbit prices for rabbit prompts. Ledger stays append-only; hash-chain entries before charging for real."
+}

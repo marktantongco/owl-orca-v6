@@ -1,0 +1,21 @@
+{
+  "algorithm": "SP-7",
+  "dimensions": {
+    "VD": "Visual Density",
+    "IR": "Interactivity Requirement",
+    "DC": "Data Complexity",
+    "MN": "Motion Need",
+    "AW": "Accessibility Weight",
+    "AR": "AI Redirect Value",
+    "CR": "Component Reusability"
+  },
+  "tiers": {
+    "T0": "Foundation Design Intelligence Layer Stitch Design Framer Motion UI/UX Pro Max v7 21st.dev Registry",
+    "T1": "Interactive Motion & Data Layer GSAP Remotion Mermaid AntV Chain of Thought Socratic Simulation Sandbox MCP Builder",
+    "T2": "Visual Asset Generation & Capture Layer shadcn Playwright Chart Web Artifacts SEO Humanizer Social",
+    "T3": "Portal Custom Intelligence Layer AI Portal Redirect Stack Prioritizer Matrix Engine Design Algorithm JTBD Research Gumroad Pipeline Skill Finder Persistent Memory"
+  },
+  "proxy_topology": ["Transparent Caching", "Anonymous Privacy", "Reverse Load balancing", "Forward Egress control", "SSL/TLS Inspection", "Caching Origin load reduction"],
+  "skills": 45,
+  "install_order": "T0->T3 strict no tier without predecessors"
+}

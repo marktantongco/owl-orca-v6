@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>OWL-ORCA v6 — Compact Ops Runbook</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+@page { size: 720px 1020px; margin: 0; }
+:root {
+  --c-bg: #0d1117;      /* page background — darkest */
+  --c-panel: #161b22;   /* card/command panel — same hue family */
+  --c-text: #e6edf3;    /* primary text */
+  --c-muted: #8b949e;   /* secondary text */
+  --c-accent: #f0883e;  /* owl amber */
+}
+html, body {
+  margin: 0; padding: 0; width: 720px;
+  background: var(--c-bg); color: var(--c-text);
+  font-family: 'Inter', 'Liberation Sans', sans-serif;
+  line-break: strict; word-break: normal;
+}
+@media screen {
+  html { height: auto; display: flex; justify-content: center; background: #05070a; }
+  body { transform-origin: top center; margin: 20px auto; }
+}
+* { box-sizing: border-box; }
+p, td, li, div { overflow-wrap: break-word; word-break: break-word; }
+
+/* ============ COVER (fixed height, standalone page) ============ */
+.cover {
+  width: 720px; height: 1020px; break-after: page; overflow: hidden;
+  display: flex; flex-direction: column; justify-content: center;
+  padding: 60px; position: relative;
+}
+.cover .ring {
+  position: absolute; border: 1px solid rgba(240,136,62,.28); border-radius: 50%;
+}
+.cover .r1 { width: 420px; height: 420px; right: -140px; top: -120px; }
+.cover .r2 { width: 260px; height: 260px; right: 40px; top: 60px; border-color: rgba(139,148,158,.18); }
+.cover .r3 { width: 180px; height: 180px; left: -60px; bottom: 120px; border-color: rgba(240,136,62,.16); }
+.cover .tag {
+  font-size: 13px; font-weight: 700; letter-spacing: .28em; text-transform: uppercase;
+  color: var(--c-accent); margin-bottom: 18px;
+}
+.cover .title { font-size: 64px; font-weight: 900; line-height: .95; letter-spacing: -.02em; }
+.cover .subtitle { font-size: 19px; font-weight: 400; color: var(--c-muted); line-height: 1.55; margin-top: 22px; max-width: 520px; }
+.cover .chips { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 30px; max-width: 100%; }
+.cover .chip {
+  font-family: 'Liberation Mono','DejaVu Sans Mono',monospace; font-size: 11px;
+  color: var(--c-text); background: var(--c-panel); padding: 6px 12px; border-radius: 4px;
+  border: 1px solid rgba(139,148,158,.25);
+}
+.cover .foot {
+  position: absolute; bottom: 54px; left: 60px; right: 60px;
+  display: flex; justify-content: space-between; align-items: flex-end;
+  font-family: 'Liberation Mono','DejaVu Sans Mono',monospace;
+  font-size: 10.5px; color: var(--c-muted); letter-spacing: .04em;
+}
+.cover .foot .bar { flex: 1; height: 1px; background: rgba(139,148,158,.3); margin: 0 14px; }
+
+/* ============ MAIN CONTENT (flows — NO fixed height) ============ */
+.main-content { padding: 56px 60px 40px 60px; }
+
+.chapter-header { break-after: avoid; break-inside: avoid; margin-top: 26px; }
+.chapter-header:first-child { margin-top: 0; }
+.section-tag {
+  font-family: 'Liberation Mono','DejaVu Sans Mono',monospace; font-size: 11px;
+  color: var(--c-accent); letter-spacing: .22em; text-transform: uppercase; font-weight: 700;
+}
+.section-title { font-size: 27px; font-weight: 900; margin-top: 6px; letter-spacing: -.01em; }
+.divider { width: 44px; height: 3px; background: var(--c-accent); margin: 12px 0 16px 0; border-radius: 2px; }
+
+.body-text { font-size: 13.5px; line-height: 1.65; color: var(--c-text); margin-bottom: 12px; }
+.body-text .m { color: var(--c-muted); }
+
+/* command block */
+.cmd {
+  font-family: 'Liberation Mono','DejaVu Sans Mono',monospace; font-size: 12px;
+  background: var(--c-panel); border-left: 3px solid var(--c-accent);
+  padding: 12px 16px; border-radius: 0 4px 4px 0; line-height: 1.7;
+  break-inside: avoid; margin: 10px 0 14px 0; color: var(--c-text);
+}
+.cmd .p { color: var(--c-muted); } /* prompt sigil */
+.cmd .c { color: var(--c-accent); } /* command emphasis */
+
+/* tables */
+table { width: 100%; border-collapse: collapse; table-layout: fixed; margin: 10px 0 16px 0; break-inside: auto; }
+thead { display: table-header-group; }
+th {
+  font-size: 10.5px; text-transform: uppercase; letter-spacing: .1em; color: var(--c-accent);
+  text-align: left; padding: 7px 9px; border-bottom: 1.5px solid rgba(240,136,62,.45);
+  font-weight: 700; overflow-wrap: break-word;
+}
+td {
+  font-size: 12px; padding: 7px 9px; border-bottom: 1px solid rgba(139,148,158,.18);
+  vertical-align: top; overflow-wrap: break-word; color: var(--c-text);
+}
+td .mut { color: var(--c-muted); }
+tr { break-inside: avoid; }
+.mono { font-family: 'Liberation Mono','DejaVu Sans Mono',monospace; font-size: 11px; }
+
+/* card */
+.card {
+  background: var(--c-panel); border-radius: 6px; padding: 14px 18px;
+  break-inside: avoid; margin-bottom: 14px; border: 1px solid rgba(139,148,158,.16);
+}
+.card .ct { font-size: 12.5px; font-weight: 700; color: var(--c-accent); margin-bottom: 5px; letter-spacing: .02em; }
+.card .cb { font-size: 12.5px; line-height: 1.6; color: var(--c-text); }
+.card .cb .m { color: var(--c-muted); }
+
+.callout {
+  border-left: 3px solid var(--c-accent); background: rgba(240,136,62,.07);
+  padding: 12px 16px; border-radius: 0 4px 4px 0; margin: 12px 0 14px 0;
+  font-size: 12.5px; line-height: 1.6; break-inside: avoid;
+}
+.callout b { color: var(--c-accent); }
+
+/* ============ ENDING (fixed height, standalone page) ============ */
+.ending {
+  width: 720px; height: 1020px; break-before: page; overflow: hidden;
+  display: flex; flex-direction: column; justify-content: center; align-items: center;
+  text-align: center; padding: 60px; position: relative;
+}
+.ending .big { font-size: 40px; font-weight: 900; line-height: 1.05; letter-spacing: -.01em; }
+.ending .sub { font-size: 15px; color: var(--c-muted); line-height: 1.7; margin-top: 18px; max-width: 520px; }
+.ending .verif {
+  margin-top: 34px; font-family: 'Liberation Mono','DejaVu Sans Mono',monospace;
+  font-size: 11.5px; line-height: 2.0; color: var(--c-text);
+  background: var(--c-panel); padding: 18px 22px; border-radius: 6px; width: -moz-fit-content; width: fit-content; text-align: left;
+  border: 1px solid rgba(139,148,158,.2);
+}
+.ending .verif .ok { color: var(--c-accent); }
+</style>
+</head>
+<body>
+
+<!-- ================= COVER ================= -->
+<div class="cover">
+  <div class="ring r1"></div><div class="ring r2"></div><div class="ring r3"></div>
+  <div class="tag">OWL-ORCA v6 · Unified Final</div>
+  <div class="title">Compact<br>Ops Runbook</div>
+  <div class="subtitle">Boot ladder, tuned breaker policy, animal cost-tier routing, and daily operator commands for the v4.9 + v5 unified installer with all nine speed hacks live.</div>
+  <div class="chips">
+    <div class="chip">router :60001</div>
+    <div class="chip">ledger 1044M</div>
+    <div class="chip">v13-tuned-smp5.1.1</div>
+    <div class="chip">audit 15/15</div>
+    <div class="chip">PH · no DPI tier</div>
+  </div>
+  <div class="foot">
+    <span>OPS-RUNBOOK · 2026-10</span>
+    <div class="bar"></div>
+    <span>sha256 250cf32d…</span>
+  </div>
+</div>
+
+<!-- ================= MAIN CONTENT ================= -->
+<div class="main-content">
+
+  <!-- §1 -->
+  <div class="chapter-header">
+    <div class="section-tag">§1 · System at a Glance</div>
+    <div class="section-title">One Router, Nine Hacks, 1044M</div>
+    <div class="divider"></div>
+  </div>
+  <div class="body-text">
+    OWL-ORCA v6 merges the v4.9 ecosystem framework and the v5 installer into a single 2,888-line
+    artifact that provisions a Python asyncio router plane, an embedded Tier-0 JSON taxonomy, a
+    billing sidecar, and an optional defense egress tier. The two Next.js PWA planes of the v5
+    lineage (384M for :3002/:3003/:3004) are replaced by a 10M in-process classifier, and the
+    ruflo swarm is demoted to external-only after it violated the memory cap. Every optimization
+    from the speed-hack sheet ships as real code, not a placeholder: uvloop installs as the event
+    loop policy, the radix trie is a flat 4KB array, and the StreamRacer cancels losing upstreams
+    on first byte.
+  </div>
+  <div class="body-text">
+    The memory ledger below is the default boot profile with the standard egress tier enabled.
+    It totals roughly 1044M against the v5 equivalent path of 1418M to 2697M, a saving driven by
+    five deliberate trims: the PWA plane (374M), the canary and swarm units (768M), the DPI bypass
+    tier (148M), hydra-gate (128M), and nylon (5M). Each trimmed component remains available
+    behind an explicit opt-in flag rather than being deleted, so the operator can re-arm any tier
+    when the operating environment changes.
+  </div>
+  <table>
+    <thead><tr><th style="width:24%">Plane</th><th style="width:20%">Port</th><th style="width:16%">Memory</th><th>Role</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">orca-router</td><td class="mono">127.0.0.1:60001</td><td>384M cap</td><td>H1–H8 router, classifier, SSE translation</td></tr>
+      <tr><td class="mono">forward_proxy</td><td class="mono">127.0.0.1:60000</td><td>128M cap</td><td>Billing sidecar, JSONL ledger, atomic rotate</td></tr>
+      <tr><td class="mono">kiro-gateway</td><td class="mono">127.0.0.1:8333</td><td>256M cap</td><td>AWS Builder OIDC shim, sonnet fallback</td></tr>
+      <tr><td class="mono">tier0 (in-proc)</td><td class="mono">in-proc</td><td>~10M</td><td>Animal classifier, SP-7, LRU 1024</td></tr>
+      <tr><td class="mono">mempalace-lazy</td><td class="mono">127.0.0.1:60004</td><td>0 fixed</td><td>H6 LazyModel, loads on first tool call</td></tr>
+      <tr><td class="mono">freebuff-proxy</td><td class="mono">127.0.0.1:1455</td><td>256M</td><td>Go Fiber uTLS JA3 chrome120 egress</td></tr>
+      <tr><td class="mono">graftcp</td><td class="mono">wrapper</td><td>~10M</td><td>Seccomp-BPF socket trap, socks5-only</td></tr>
+    </tbody>
+  </table>
+  <div class="callout">
+    <b>Operator context: Mandaluyong, PH.</b> There is no nation-state DPI on local circuits.
+    The DPI bypass tier (mhrv-rs, mieru, GooseRelay, 148M combined) therefore ships gated OFF.
+    Install it only after every standard circuit reads OPEN and a block is confirmed on the wire.
+  </div>
+
+  <!-- §2 -->
+  <div class="chapter-header">
+    <div class="section-tag">§2 · Boot Ladder</div>
+    <div class="section-title">Dry-Run, Core-Only, Then Egress</div>
+    <div class="divider"></div>
+  </div>
+  <div class="body-text">
+    The installer follows a strict three-rung ladder. The first rung is a pure plan review: the
+    24 steps are enumerated, every flag combination is resolved, and nothing touches the disk.
+    The second rung boots the 768M core with the embedded Tier-0 taxonomy and proves all nine
+    hacks through the in-process selftest. The third rung adds the defense egress tier. The DPI
+    tier is not a rung on this ladder; it is a contingency bolted on later, only on
+    evidence.
+  </div>
+  <div class="cmd">
+    <span class="p">$</span> <span class="c">bash owl-orca-v6-unified-final-installer.sh --dry-run --with-all-egress</span><br>
+    <span class="p">#</span> plan review only — 24 steps enumerated, DPI skipped (F5), exit 0<br>
+    <span class="p">$</span> <span class="c">bash owl-orca-v6-unified-final-installer.sh --core-only</span><br>
+    <span class="p">#</span> first boot: router+forward+kiro+mempalace-lazy, 768M embedded tier-0<br>
+    <span class="p">$</span> <span class="c">bash owl-orca-v6-unified-final-installer.sh --with-all-egress</span><br>
+    <span class="p">#</span> full defense tier: freebuff + graftcp + hydra + nylon, ledger ~1044M
+  </div>
+  <div class="body-text">
+    In a systemd-less environment the units are started directly through the venv interpreter.
+    The verification battery used during tuning booted all four core services with
+    <span class="mono">setsid nohup</span>, confirmed the four listening ports, drove the
+    classifier, tripped the breakers, and proved the SIGHUP reload, all from a single
+    invocation of the persisted script
+    <span class="mono">scripts/fresh_box_tuned_verify.sh</span>.
+  </div>
+
+  <!-- §3 -->
+  <div class="chapter-header">
+    <div class="section-tag">§3 · Flag Matrix</div>
+    <div class="section-title">Every Switch, One Table</div>
+    <div class="divider"></div>
+  </div>
+  <table>
+    <thead><tr><th style="width:34%">Flag</th><th style="width:18%">Memory</th><th>Effect</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">--dry-run</td><td>0</td><td>Enumerate the 24-step plan; no disk writes</td></tr>
+      <tr><td class="mono">--core-only</td><td>768M</td><td>Router, forward proxy, kiro shim, embedded Tier-0</td></tr>
+      <tr><td class="mono">--with-all-egress</td><td>~1044M</td><td>Adds freebuff + graftcp; hydra/nylon still default OFF</td></tr>
+      <tr><td class="mono">--with-dpi-bypass</td><td>+148M</td><td>mhrv-rs + mieru + GooseRelay (evidence-gated)</td></tr>
+      <tr><td class="mono">--with-all-egress-dpi</td><td>~1192M</td><td>Superset: all egress plus the DPI tier</td></tr>
+      <tr><td class="mono">--with-hydra / --with-nylon</td><td>+128M / +5M</td><td>Hydra only with Playwright automation; nylon only without :60000</td></tr>
+      <tr><td class="mono">--safe-mode</td><td>n/a</td><td>Activation guard aware; skips auto-activation</td></tr>
+    </tbody>
+  </table>
+  <div class="body-text">
+    Flag precedence is deliberate: <span class="mono">--core-only</span> zeroes every optional
+    tier regardless of what else was passed, and <span class="mono">--with-all-egress-dpi</span>
+    implies <span class="mono">--with-all-egress</span> plus every DPI component. The audit
+    harness runs seven flag-matrix permutations against the installer to keep these
+    implications honest, and all fifteen audit checks passed on the tuned build.
+  </div>
+
+  <!-- §4 -->
+  <div class="chapter-header">
+    <div class="section-tag">§4 · Circuit Breaker Policy</div>
+    <div class="section-title">Tuned Per Cost-Tier</div>
+    <div class="divider"></div>
+  </div>
+  <div class="body-text">
+    The breaker is a lock-free state machine: a plain atomic failure counter and a
+    <span class="mono">time.monotonic()</span> timestamp, mutated only on the single-threaded
+    event loop with no await points inside the hot path. The tuning session differentiated the
+    thresholds by tier economics, because the cost of locking out a provider is not uniform
+    across the stack. Cheap upstreams have many alternatives, so a dead one should be cut fast
+    and forgiven fast. Premium upstreams are scarce, so they deserve patience before a lockout.
+    The expensive residential tier exists solely for 403 work, so it trips quickly and stays
+    dark for five minutes to protect quota.
+  </div>
+  <table>
+    <thead><tr><th style="width:18%">Tier</th><th style="width:14%">Trip</th><th style="width:16%">Cooldown</th><th style="width:12%">Decay</th><th>Rationale</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">cheap</td><td>3 fails</td><td>45s</td><td>2</td><td>Alternatives abound; recover fast</td></tr>
+      <tr><td class="mono">medium</td><td>5 fails</td><td>60s</td><td>1</td><td>Proven default from the live boot test</td></tr>
+      <tr><td class="mono">premium</td><td>7 fails</td><td>90s</td><td>1</td><td>Patient; lockout hurts the good models</td></tr>
+      <tr><td class="mono">expensive</td><td>3 fails</td><td>300s</td><td>1</td><td>Quota protection, anti-ban backoff</td></tr>
+    </tbody>
+  </table>
+  <div class="body-text">
+    Two semantics matter during operations. First, breaker state intentionally survives a SIGHUP
+    reload. The registry keeps its failure memory across config swaps, so a hot reload never
+    forgets that an upstream was misbehaving. Second, threshold changes from a tuned
+    <span class="mono">providers.json</span> apply to newly created breakers or after a restart;
+    existing breakers keep the policy they were born with. The live proof during tuning showed
+    the differentiation exactly: <span class="mono">antigravity-free</span> (cheap) opened at
+    precisely three failures while <span class="mono">nvidia-nim</span> (medium) held CLOSED at
+    three and would have tripped at five.
+  </div>
+  <div class="cmd">
+    <span class="p">$</span> curl -s http://127.0.0.1:60001/healthz <span class="p">|</span> <span class="c">python3 -c</span> <span class="p">"import sys,json; print(json.load(sys.stdin)['hacks']['H4_breakers'])"</span><br>
+    <span class="p">#</span> {'kiro-free': ['CLOSED', 0], 'nvidia-nim': ['CLOSED', 3], 'antigravity-free': ['OPEN', 3]}
+  </div>
+
+  <!-- §5 -->
+  <div class="chapter-header">
+    <div class="section-tag">§5 · Animal Routing</div>
+    <div class="section-title">Cost-Tier Mapping, v13-Tuned</div>
+    <div class="divider"></div>
+  </div>
+  <div class="body-text">
+    The Tier-0 classifier maps every prompt to one of seven animal modes inherited from the
+    smp5.1.1 doctrine, and each mode carries a cost tier that narrows the StreamRacer candidate
+    pool. The v13 tuning fixed the routing gap that the boot battery exposed: rabbit previously
+    keyed only on ideation words and silently swallowed every speed prompt into the owl default.
+    Rabbit now keys on twenty speed and multiply tokens, ant gained the singular
+    <span class="mono">step</span> alongside <span class="mono">steps</span>, and two
+    collision-prone keys were removed: owl dropped <span class="mono">post</span> (it matched
+    blog and HTTP posts) and ant dropped the ambiguous verb <span class="mono">break</span>.
+    Classification latency held between 0.021ms and 0.037ms across the full battery, far inside
+    the 5ms envelope, with every probe routed correctly on a fresh box.
+  </div>
+  <table>
+    <thead><tr><th style="width:17%">Mode</th><th style="width:15%">Tier</th><th style="width:15%">Fallback</th><th>Doctrine</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">rabbit</td><td>cheap</td><td>cheap</td><td>Speed: no over-engineering, ship variations fast</td></tr>
+      <tr><td class="mono">ant</td><td>cheap</td><td>cheap</td><td>Systematic: no skipped steps, smallest units</td></tr>
+      <tr><td class="mono">dolphin</td><td>cheap</td><td>cheap</td><td>Creative: no conventional solutions</td></tr>
+      <tr><td class="mono">beaver</td><td>medium</td><td>cheap</td><td>Builder: no theory, practical systems</td></tr>
+      <tr><td class="mono">elephant</td><td>medium</td><td>cheap</td><td>Memory: no amnesia, durable context</td></tr>
+      <tr><td class="mono">eagle</td><td>premium</td><td>medium</td><td>Strategy: no weeds, long-term patterns</td></tr>
+      <tr><td class="mono">owl</td><td>premium</td><td>medium</td><td>Depth: no shallow answers, hidden factors</td></tr>
+    </tbody>
+  </table>
+  <div class="body-text">
+    The fallback ladder in the third column is declared in the rules JSON for the StreamRacer:
+    when every breaker in a mode's home tier reads OPEN, the race degrades one rung instead of
+    hard-failing the request. Volume modes route to the free upstreams, synthesis modes to the
+    medium tier, and the two deep-reasoning modes reserve the premium pool with a medium-tier
+    parachute. Keyword matching is token-exact against the radix trie, which means hyphenated
+    key phrases never match — the text tokenizer splits on non-alphanumerics — so multi-word
+    concepts are expressed as paired tokens such as <span class="mono">cross</span> plus
+    <span class="mono">field</span>.
+  </div>
+  <div class="cmd">
+    <span class="p">$</span> curl -s -X POST http://127.0.0.1:60001/v1/prompt/classify <span class="p">-d</span> <span class="c">'{"prompt":"quick prototype fast ship now"}'</span><br>
+    <span class="p">#</span> {"animal":"rabbit","mode":"Speed & Multiply Ideas","cost_tier":"cheap","elapsed_ms":0.026}
+  </div>
+
+  <!-- §6 -->
+  <div class="chapter-header">
+    <div class="section-tag">§6 · Daily Ops</div>
+    <div class="section-title">Health, Reload, Selftest</div>
+    <div class="divider"></div>
+  </div>
+  <div class="body-text">
+    The three routines below cover the daily loop. The health endpoint reports the hack status
+    matrix, the breaker snapshot, and the LRU cache statistics in one call. The reload script
+    performs the atomic-rename swap and raises SIGHUP, which re-reads the four config files
+    without dropping a single TCP connection. The selftest asserts all in-process hacks,
+    including the 1.87us radix lookup and the SSE field translation, and is safe to run against
+    the live router.
+  </div>
+  <div class="cmd">
+    <span class="p">$</span> <span class="c">/home/z/.owl-orca-v6/bin/orca-health-check.sh</span>      <span class="p"># 9-hack selftest</span><br>
+    <span class="p">$</span> <span class="c">/home/z/.owl-orca-v6/bin/orca-reload.sh</span>            <span class="p"># SIGHUP, no TCP drop</span><br>
+    <span class="p">$</span> curl -s http://127.0.0.1:60001/healthz <span class="p">|</span> python3 -m json.tool<br>
+    <span class="p">$</span> <span class="c">/home/z/.owl-orca-v6/bin/graftcp-wrapper.sh</span> curl https://example.com   <span class="p"># H9 egress proof</span>
+  </div>
+  <div class="callout">
+    <b>Config edits under a live router.</b> Never edit <span class="mono">promptc-os-rules.json</span>
+    or <span class="mono">providers.json</span> in place. Write to a temp file and
+    <span class="mono">os.replace()</span> it into position, then send SIGHUP. The atomic inode
+    swap is what protects IDE watchers and the reload path from torn reads — the same discipline
+    the installer itself uses.
+  </div>
+
+  <!-- §7 -->
+  <div class="chapter-header">
+    <div class="section-tag">§7 · Escalation</div>
+    <div class="section-title">When to Add the DPI Tier</div>
+    <div class="divider"></div>
+  </div>
+  <div class="body-text">
+    The DPI tier is a contingency, not a default. It costs 148M of memory and three extra
+    processes (mhrv-rs, mieru, GooseRelay) whose only purpose is to disguise traffic from
+    nation-state packet inspection. On Philippine circuits that machinery is pure overhead. The
+    gate criteria are strict and both must be true: every standard egress circuit must read OPEN
+    in the breaker snapshot after real attempts, and a block must be confirmed on the wire with
+    a connection-level symptom rather than a quota or auth error.
+  </div>
+  <div class="card">
+    <div class="ct">Evidence checklist before arming DPI</div>
+    <div class="cb">
+      1. All breakers OPEN across cheap and medium tiers after live traffic.<br>
+      2. curl through the egress chain fails with a connection reset or timeout, not 401/403/429.<br>
+      3. The failure reproduces across at least two upstreams and two time windows.<br>
+      Then and only then: <span class="mono">--with-dpi-bypass</span> (GooseRelay tunnel key via
+      <span class="mono">openssl rand -hex 32</span>, quota 20k/day shared per Google account,
+      reset midnight Pacific).
+    </div>
+  </div>
+  <div class="body-text">
+    Hydra-gate and nylon carry their own activation logic, independent of DPI. Hydra earns its
+    128M only when Playwright automation is in play, because its six rotation modes and
+    auth-stripping exist to keep browser sessions alive. Nylon earns 5M only when the forward
+    proxy is absent — its ACL CIDR and mirror features duplicate what :60000 already provides,
+    and SIGHUP re-exec makes it cheap to keep on standby rather than running.
+  </div>
+
+  <!-- §8 -->
+  <div class="chapter-header">
+    <div class="section-tag">§8 · Troubleshooting</div>
+    <div class="section-title">Fast Symptom Table</div>
+    <div class="divider"></div>
+  </div>
+  <table>
+    <thead><tr><th style="width:30%">Symptom</th><th>First Move</th></tr></thead>
+    <tbody>
+      <tr><td>Router 502 on completions</td><td>Check <span class="mono">H4_breakers</span> in healthz; wait out the tier cooldown or restart to reset policy</td></tr>
+      <tr><td>Prompt routes to owl unexpectedly</td><td>Classify with the raw prompt and inspect <span class="mono">keywords_hit</span>; check the token is a trie key in v13 rules</td></tr>
+      <tr><td>Healthz returns empty</td><td>Boot order — wait 8s after start; check <span class="mono">/tmp/orca-router.log</span> for uvicorn startup line</td></tr>
+      <tr><td>Config edit not visible</td><td>SIGHUP only re-reads after the atomic swap; in-place edits are invisible until next restart</td></tr>
+      <tr><td>407 from Chromium egress</td><td>Pass <span class="mono">--proxy-server</span> to Chromium; auth-stripping lives in hydra-gate, not freebuff</td></tr>
+      <tr><td>Mempalace memory high at idle</td><td>H6 unloads after 300s; confirm with <span class="mono">/status</span> on :60004 that loaded=false at rest</td></tr>
+    </tbody>
+  </table>
+
+  <!-- §9 -->
+  <div class="chapter-header">
+    <div class="section-tag">§9 · Rebuild Chain</div>
+    <div class="section-title">Edit, Rebuild, Audit</div>
+    <div class="divider"></div>
+  </div>
+  <div class="body-text">
+    The installer is assembled from six part files and must be rebuilt through the chain below
+    after any edit, so the delivered artifact never drifts from its source. The audit harness
+    extracts all fifty-two embedded artifacts, compiles every Python module, parses every JSON
+    document, verifies the port registry, and asserts all nineteen hack markers plus the ten
+    merge fixes. A build that fails any of the fifteen checks does not ship.
+  </div>
+  <div class="cmd">
+    <span class="p">$</span> <span class="c">cd ~/my-project/scripts</span> <span class="p">&&</span> cat v6_part1.sh v6_part2.sh v6_part3.sh v6_part4.sh v6_part5.sh v6_part6.sh \<br>
+    &nbsp;&nbsp;&gt; ~/my-project/download/owl-orca-v6-unified-final-installer.sh<br>
+    <span class="p">$</span> bash -n ~/my-project/download/owl-orca-v6-unified-final-installer.sh<br>
+    <span class="p">$</span> <span class="c">python3 scripts/audit_v6.py</span>   <span class="p"># expect 15/15 PASS</span>
+  </div>
+  <div class="body-text">
+    The tuning session left three persisted scripts in the same directory:
+    <span class="mono">tune_v6.sh</span> for the JSON swaps and SIGHUP,
+    <span class="mono">core_boot_verify.sh</span> for the boot battery, and
+    <span class="mono">fresh_box_tuned_verify.sh</span> for the clean-install proof. They are
+    the fastest way to re-validate any future edit against a live router, and each is safe to
+    run repeatedly because the installer and the boot battery are both idempotent.
+  </div>
+
+</div><!-- /main-content -->
+
+<!-- ================= ENDING ================= -->
+<div class="ending">
+  <div class="ring r1" style="position:absolute;width:380px;height:380px;border:1px solid rgba(240,136,62,.22);border-radius:50%;right:-120px;bottom:-100px;"></div>
+  <div class="big">Verified on a<br>fresh box.</div>
+  <div class="sub">Every claim in this runbook was executed, not asserted: the dry-run plan review, the core-only boot, the tuned classification battery, the per-tier breaker trip, and the SIGHUP no-drop reload all ran against the rebuilt artifact.</div>
+  <div class="verif">
+    <span class="ok">✓</span> audit 15/15 PASS · 0 fail — tuned build, sha256 250cf32d…<br>
+    <span class="ok">✓</span> install --core-only exit 0 · 4 ports listening<br>
+    <span class="ok">✓</span> rules v13-tuned-smp5.1.1 · 6/6 probes routed · 0.021–0.037ms<br>
+    <span class="ok">✓</span> breakers: cheap OPEN@3 · medium CLOSED@3 · patient@5<br>
+    <span class="ok">✓</span> SIGHUP hot reload · healthz OK after HUP · no TCP drop
+  </div>
+</div>
+
+</body>
+</html>

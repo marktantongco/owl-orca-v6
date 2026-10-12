@@ -1,0 +1,74 @@
+{
+  "_comment": "OWL-ORCA v6 routes — cost-tier selects candidates, racing decides winner inside tier (contradiction resolved); v6.2: routing_preference orders candidates before the race",
+  "version": "6.2.0-unified",
+  "routes": [
+    {
+      "pattern": "/v1/chat/completions", "method": "POST",
+      "strategy": "cost-aware-race",
+      "routing_preference": "balanced",
+      "description": "Tier0 H7 classify -> NadirClaw cost tier -> StreamRacer H3 first-byte-wins bounded 5; v6.2: weight/p50-EMA ordering (price|latency|balanced) + quota-gated candidate skip",
+      "cost_logic": {
+        "simple_query":  {"max_tokens": 500,
+                          "targets": ["copilot-free", "antigravity-free", "freebuff-deepseek"],
+                          "savings": "70%"},
+        "medium_query":  {"max_tokens": 2000,
+                          "targets": ["copilot-free", "antigravity-free", "freebuff-deepseek", "nvidia-nim"],
+                          "savings": "50%"},
+        "complex_query": {"max_tokens": 8000,
+                          "targets": ["kiro-free", "nvidia-nim", "antigravity-free"],
+                          "savings": "40%"},
+        "blocked_fallback": {"status": [403, 429], "targets": ["novada-residential"],
+                             "note": "residential MCP last resort"}
+      },
+      "middleware": [
+        {"stage": "billing",   "service": "owl-forward-billing", "port": 60000, "order": 1},
+        {"stage": "defense",   "service": "owl-defense-v6", "order": 2,
+         "cache_ttl": 300, "dedup": true, "rate_limit": 1.0},
+        {"stage": "token_saver", "service": "rtk-token-saver", "order": 3,
+         "enabled": false, "preserve_tool_use": true},
+        {"stage": "tier0",     "service": "classifier H7", "order": 4,
+         "lru_cache": 1024, "envelope_ms": 5, "target_ms": 2},
+        {"stage": "race",      "service": "StreamRacer H3", "order": 5,
+         "first_byte_wins": true, "bounded_queue": 5, "cancel_losers": true,
+         "translation": "chunk_by_chunk"},
+        {"stage": "egress",    "service": "freebuff-proxy", "port": 1455, "order": 6,
+         "ja3_stealth": true, "socks5_pool": true, "multi_token": true},
+        {"stage": "memory",    "service": "memory-hub", "order": 7,
+         "store_winner": true, "decay_failures": true}
+      ],
+      "circuit_breaker": {"threshold": 5, "cooldown": 60, "decay": 1,
+                          "half_open_probe": 1},
+      "translation": {
+        "anthropic_to_openai": {
+          "message_start": "role_chunk",
+          "content_block_delta_text": "content_delta",
+          "thinking_delta": "reasoning_content",
+          "input_json_delta": "tool_call_args"
+        }
+      }
+    },
+    {
+      "pattern": "/v1/messages", "method": "POST", "strategy": "race",
+      "description": "Anthropic Messages API — SSE translated chunk-by-chunk (H3b)",
+      "targets": ["antigravity-free", "freebuff-deepseek"]
+    },
+    {
+      "pattern": "/v1/models", "method": "GET", "strategy": "single",
+      "cache_ttl": 3600, "targets": ["copilot-free"]
+    },
+    {
+      "pattern": "/v1/prompt/classify", "method": "POST", "strategy": "single",
+      "description": "Tier-0 animal classifier — lru_cache(1024) <2ms (H7)",
+      "targets": ["self"]
+    },
+    {
+      "pattern": "/healthz", "method": "GET", "strategy": "single",
+      "targets": ["self"], "defense": {"cache": false, "dedup": false}
+    },
+    {
+      "pattern": "/admin/reload", "method": "POST", "strategy": "single",
+      "description": "SIGHUP hot-reload equivalent without dropping TCP (H5)",
+      "targets": ["self"], "safe_mode": "check IDE active"
+    }
+  ]
+}
