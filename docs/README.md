@@ -24,3 +24,23 @@ curl -s http://127.0.0.1:60001/healthz | jq  # live router
 ```
 
 Need the ops runbook as a document? It ships in this repo: [`owl-orca-v6-ops-runbook.html`](owl-orca-v6-ops-runbook.html). The upstream research playbook is here too: [`owl-orca-v6.1-upstream-playbook.docx`](owl-orca-v6.1-upstream-playbook.docx).
+
+---
+
+## Want these pages in the official GitHub Wiki tab?
+
+This `docs/` folder is the source of truth. The Wiki tab needs a one-time click (GitHub provisions its git backend only when the first page is saved — there is no API for it), then one copy-paste publishes everything:
+
+1. Open the **Wiki** tab → **Create the first page** → save any placeholder.
+2. From a clone of this repository:
+
+```bash
+git clone https://github.com/marktantongco/owl-orca-v6.wiki.git wiki-live
+cp docs/*.md wiki-live/
+sed -i 's#src="../images/#src="https://raw.githubusercontent.com/marktantongco/owl-orca-v6/main/images/#' \
+  wiki-live/09-monetization-ideas.md
+cd wiki-live
+git add -A && git commit -m "wiki: publish the 10-page walkthrough" && git push
+```
+
+The pages cross-link to each other by filename, so the wiki navigates exactly like this folder — and the `sed` line re-points the concept-art images at the raw URLs hosted in the main repo.
